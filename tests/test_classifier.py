@@ -18,6 +18,7 @@ def test_facial_recognition():
     assert res.prediction_drivers_licence.confidence    > res.prediction_invoice.confidence
 
 
+
 @pytest.mark.parametrize("file_name, expected_class", [
     ("bank_statement_1.pdf", constants.Classes.BANK_STATEMENT),
     ("bank_statement_2.pdf", constants.Classes.BANK_STATEMENT),
@@ -42,4 +43,4 @@ def test_ensemble_logic(file_name, expected_class):
     file_path = f"/Users/chriswilliams/repo/classification/files/{file_name}"
     res = ensemble.predict_file(file_path)
 
-    print()
+    assert res == expected_class

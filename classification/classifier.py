@@ -1,3 +1,4 @@
+import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import List
@@ -9,39 +10,48 @@ from classification.constants import Classes, FileTypes
 
 from werkzeug.datastructures import FileStorage
 
+logger = logging.getLogger(__name__)
 
 @dataclass
-class ClassPrediction():
-    class_ref: Classes = field()  # TODO nullable=False
+class Prediction():
+    class_ref: Classes = field()
     probability: float = field()
     confidence: float = field()
     
+    @property
+    def positive_prediction_strength(self):
+        # Return the 'positive prediction strength', the idea is that a very confident positive
+        return self.probability * self.confidence
+
     def __dict__(self):
         return {
             "class_ref": self.class_ref,
             "probability": self.probability,
             "confidence": self.confidence,
         }
-    def __repr__(self):
-        return f"""
-PREDICTION: {self.class_ref}: {self.confidence} | {self.probability}
-"""
+    
+#     def __repr__(self):
+#         return f"""
+# PREDICTION: {self.confidence} | {self.probability}
+# """
 
 @dataclass
-class Prediction():
-    prediction_bank_statement: ClassPrediction = field()
-    prediction_drivers_licence: ClassPrediction = field()
-    prediction_invoice: ClassPrediction = field()
+class MulticlassPrediction():
+    prediction_bank_statement: Prediction = field()
+    prediction_drivers_licence: Prediction = field()
+    prediction_invoice: Prediction = field()
     # TODO implement logic to force preds to sum to 1, so they can be treated as
     # a probability distribution
 
+    @property
+    def class_predictions(self):
     # Store the preds as a list
-    class_predictions = [
-        prediction_bank_statement,
-        prediction_drivers_licence,
-        prediction_invoice,
-    ]
-    
+        return [    
+            self.prediction_bank_statement,
+            self.prediction_drivers_licence,
+            self.prediction_invoice
+        ]
+        
 
     def estimate_class(self):
         "Starting with the highest confidence level, work backwards to see if we have any confident predictions"
@@ -73,18 +83,18 @@ invoice: {self.prediction_invoice.confidence} | {self.prediction_invoice.probabi
 
 
 # Dummy prediction used in error cases
-DUMMY_PREDICITON = Prediction(
-    prediction_bank_statement = ClassPrediction(
+DUMMY_PREDICITON = MulticlassPrediction(
+    prediction_bank_statement = Prediction(
         class_ref = Classes.BANK_STATEMENT,
         probability=0.5,
         confidence=0.,
     ),
-    prediction_drivers_licence = ClassPrediction(
+    prediction_drivers_licence = Prediction(
         class_ref = Classes.DRIVERS_LICENCE,
         probability=0.5,
         confidence=0.,
     ),
-    prediction_invoice = ClassPrediction(
+    prediction_invoice = Prediction(
         class_ref = Classes.INVOICE,
         probability=0.5,
         confidence=0.,
@@ -108,8 +118,6 @@ DUMMY_PREDICITON = Prediction(
 #     return "unknown file"
 
 
-def classify_file(file: FileStorage):
-    return DUMMY_PREDICITON
 
 
 class IndividualClassifier(ABC):
@@ -119,7 +127,7 @@ class IndividualClassifier(ABC):
 
 
     @abstractmethod
-    def predict_file() -> Prediction:
+    def predict_file() -> MulticlassPrediction:
         pass
 
     # TODO extend to URL reading/classification
@@ -135,8 +143,19 @@ class EnsembleClassifier():
         self.classifiers = classifiers
 
     
-    def get_most_confident(self):
-        return
+    def _get_strongest_positive_pred(self, all_predictions):
+        preds_with_strength = [
+            (pred.class_ref, pred.positive_prediction_strength)
+            for pred
+            in all_predictions
+        ]
+        # Sort by strength
+        preds_with_strength.sort(key=lambda tuple: tuple[1])
+
+        strongest_pred = preds_with_strength[-1]
+        pred_class, pred_confidence = strongest_pred
+        logger.info(f"Best prediction: {strongest_pred} with confidence: {pred_confidence}")
+        return pred_class
 
     def predict_file(self, file):
         # Have each classifier create a prediction
@@ -149,13 +168,9 @@ class EnsembleClassifier():
         # Merge all individual class predictions into a single collection
 
         all_predictions = np.concatenate(
-            [pred.class_predictions for pred in classifier_predictions]
+            [mcp.class_predictions for mcp in classifier_predictions]
         )
 
+        strongest_pred = self._get_strongest_positive_pred(all_predictions)
 
-
-
-        return classifier_predictions
-
-
-
+        return strongest_pred

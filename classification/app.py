@@ -1,13 +1,27 @@
 from flask import Flask, request, jsonify
 
-from classification import classifier
-app = Flask(__name__)
-
 from classification import constants
+from classification.classifier import EnsembleClassifier
+from classification.classifier_face import FaceRecognitionClassifier
+from werkzeug.datastructures import FileStorage
 
+
+app = Flask(__name__)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in constants.FileTypes
+
+
+def classify_file(file: FileStorage):
+    ensemble = EnsembleClassifier(
+        classifiers=[
+            # TODO add different classifiers
+            FaceRecognitionClassifier(),
+            FaceRecognitionClassifier(),
+            FaceRecognitionClassifier(),
+        ]
+    )
+    return ensemble.predict_file(file)
 
 
 @app.route('/classify_file', methods=['POST'])
@@ -23,7 +37,7 @@ def classify_file_route():
     if not allowed_file(file.filename):
         return jsonify({"error": f"File type not allowed"}), 400
 
-    file_class = classifier.classify_file(file)
+    file_class = classify_file(file)
     return jsonify({"file_class": file_class}), 200
 
 
