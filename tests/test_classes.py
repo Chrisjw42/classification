@@ -1,6 +1,4 @@
-import pytest
-
-from classification.classifier import Prediction
+from classification.classifier import ClassPrediction, Prediction
 from classification.classifier_face import FaceRecognitionClassifier
 from classification.constants import Classes
 
@@ -10,16 +8,21 @@ def test_basic_instantiation():
 
     Prediction(
         # Dummy prediction
-        predictions={
-            Classes.BANK_STATEMENT: 0.5, 
-            Classes.DRIVERS_LICENCE: 0.5, 
-            Classes.INVOICE: 0.5
-        },
-        confidences={
-            Classes.BANK_STATEMENT: 0.5, 
-            Classes.DRIVERS_LICENCE: 0.5, 
-            Classes.INVOICE: 0.5
-        },
+        prediction_bank_statement = ClassPrediction(
+            class_ref = Classes.BANK_STATEMENT,
+            probability=0.5,
+            confidence=0.,
+        ),
+        prediction_drivers_licence = ClassPrediction(
+            class_ref = Classes.DRIVERS_LICENCE,
+            probability=0.5,
+            confidence=0.,
+        ),
+        prediction_invoice = ClassPrediction(
+            class_ref = Classes.INVOICE,
+            probability=0.5,
+            confidence=0.,
+        ),
     )
 
     FaceRecognitionClassifier()

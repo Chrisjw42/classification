@@ -1,12 +1,12 @@
 import face_recognition
 import logging
 
-from classification.classifier import Classifier, Prediction, ClassPrediction, DUMMY_PREDICITON
+from classification.classifier import IndividualClassifier, Prediction, ClassPrediction, DUMMY_PREDICITON
 from classification.constants import Classes, FileTypes
 
 logger = logging.getLogger(__name__)
 
-class FaceRecognitionClassifier(Classifier):
+class FaceRecognitionClassifier(IndividualClassifier):
     def predict_file(self, file) -> Prediction:
         
         try:

@@ -11,9 +11,12 @@ version = "0.1.0"
 [tasks]
 
 [tool.pixi.project]
-name = "classification"
 channels = ["conda-forge"]
 platforms = ["linux-64", "osx-arm64"]
+
+# Enable to import the package e.g. for jupyter/cli experimentation
+[pypi-dependencies]
+"classification" = { path = "classification", editable = true }
 
 [tool.pixi.environments]
 default = { features = ["dev"], solve-group = "default" }
