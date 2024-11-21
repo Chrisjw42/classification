@@ -30,11 +30,10 @@ class Prediction:
             "confidence": self.confidence,
         }
 
-
-#     def __repr__(self):
-#         return f"""
-# PREDICTION: {self.confidence} | {self.probability}
-# """
+    def __repr__(self):
+        return f"""
+PREDICTION: {self.confidence} | {self.probability}
+"""
 
 
 @dataclass
@@ -54,17 +53,6 @@ class MulticlassPrediction:
             self.prediction_invoice,
         ]
 
-    def estimate_class(self):
-        "Starting with the highest confidence level, work backwards to see if we have any confident predictions"
-        for confidence_level in np.linspace(1.0, 0.5, 6):
-            predictions_confident = [
-                p for p in self.class_predictions if p.confidence >= confidence_level
-            ]
-            if len(predictions_confident) == 0:
-                continue
-            if len(predictions_confident) == 1:
-                continue
-
     def __dict__(self):
         return {
             "prediction_bank_statement": dict(self.prediction_bank_statement),
@@ -80,7 +68,7 @@ invoice: {self.prediction_invoice.confidence} | {self.prediction_invoice.probabi
 """
 
 
-# Dummy prediction used in error cases
+# Dummy prediction used in cases of uncertainty
 UNCERTAIN_PREDICTION = MulticlassPrediction(
     prediction_bank_statement=Prediction(
         class_ref=Classes.BANK_STATEMENT,

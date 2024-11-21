@@ -1,4 +1,4 @@
-## Solemn oath
+# Solemn oath
 In the spirit of the challenge, I hereby swear that I will not use ChatGPT, Claude, or any other LLM to write any code in this fork.
 (Although of course, I am no stranger to them)
 
@@ -6,12 +6,15 @@ In the spirit of the challenge, I hereby swear that I will not use ChatGPT, Clau
 
 I have taken an ensemble approach, rather than placing all the eggs in a single basket, I let a few different targeted approaches 'vote' on the result. As long is the math is right, this can allows targeted algorithms (that are strong on a certain doc type) have higher influence when they are very confident.
 - The EnsembleClassifier can be instantiated with any number of IndividualClassifiers
+- Each IndividualClassifier adheres to the interface, and provides predictions with it's own methodology, e.g. face recognition.
+- The probability is supplemented with a confidence in some cases
+- The individual votes are collated by the EnsembleClassifier to find the strongest positive class score. TODO: implement negative class scoring
 
 ### Insights
 - Don't put overdue emphasis on the filename, since it highly unreliabile in general. We can use it, but we should limit the confidence of results derived from it.
 
 
-## Marking Criteria
+# Marking Criteria Comments
 - **Functionality**: Does the classifier work as expected?
     - All local files are classified correctly
     - I have also added a few randomly selected examples from the top of Google image search to guard against overfitting
@@ -31,3 +34,32 @@ I have taken an ensemble approach, rather than placing all the eggs in a single 
 - **Deployment**: Is the classifier ready for deployment in a production environment?
     - Containerised
     - prod pixi environment
+
+
+# Local development
+### Non-pixi deps
+The OCR library uses Google's tesseract model, which requires a java installation before use. https://tesseract-ocr.github.io/tessdoc/Installation.html
+
+MacOs installation via brew:
+```
+brew install tesseract
+```
+
+Linux installation::
+```
+sudo apt install tesseract-ocr
+sudo apt install libtesseract-dev
+```
+### pixi deps
+```
+curl -fsSL https://pixi.sh/install.sh | bash
+pixi shell
+```
+
+# Running the container locally
+If using a Mac with Apple Silicon, please be aware that you will need to build and run the container while setting the platform, e.g.:
+
+```
+docker build . -t classifier --platform linux/amd64
+docker run --rm -it --platform linux/amd64 classifier:latest
+```
