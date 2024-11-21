@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 
-from src.classifier import classify_file
+from classification.classifier import classify_file
 app = Flask(__name__)
 
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg'}
