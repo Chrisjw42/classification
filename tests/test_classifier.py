@@ -1,3 +1,4 @@
+import os
 import pytest
 
 from classification import constants
@@ -63,8 +64,7 @@ def test_ensemble_logic(file_name, expected_class):
         ]
     )
 
-    # TODO update this to a relative path
-    file_path = f"/Users/chriswilliams/repo/classification/files/{file_name}"
+    file_path = f"{os.getcwd()}/files/{file_name}"
     res = ensemble.predict_file(file_path)
 
     assert res == expected_class

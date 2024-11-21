@@ -8,6 +8,7 @@ from PIL import Image
 import pytesseract
 from pypdf import PdfReader
 
+from classification import utils
 from classification.classifier import (
     IndividualClassifier,
     MulticlassPrediction,
@@ -45,8 +46,6 @@ def clean_string(text: str) -> List[str]:
     text = text.lower()
 
     # Remove line breaks
-    # Note: that this line can be augmented and used over
-    # to replace any characters with nothing or a space
     text = re.sub(r"\n", " ", text)
 
     # Remove punctuation
@@ -61,6 +60,9 @@ def clean_string(text: str) -> List[str]:
 
 class OCRClassifier(IndividualClassifier):
     def predict_file(self, file_path) -> MulticlassPrediction:
+        if not utils.assess_file_compatability(file_path, self.filetype_compatibility):
+            return UNCERTAIN_PREDICTION
+
         try:
             text = self.extract_text(file_path)
         except Exception as e:
@@ -115,7 +117,7 @@ class OCRClassifier(IndividualClassifier):
             ),
         )
 
-    def extract_text(self, file_path: str):
+    def extract_text(self, file_path: str) -> List[str]:
         """Extract the raw text from the file, based on"""
         file_type = Path(file_path).suffix.lstrip(".")
         if file_type in [FileTypes.jpg.name, FileTypes.png.name]:
@@ -132,6 +134,5 @@ class OCRClassifier(IndividualClassifier):
         return text
 
     @property
-    def filetype_compatibility() -> list:
-        #!TODO filter by type
+    def filetype_compatibility(self) -> list:
         return [FileTypes.jpg, FileTypes.png, FileTypes.pdf]

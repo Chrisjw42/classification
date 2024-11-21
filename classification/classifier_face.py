@@ -8,17 +8,21 @@ from classification.classifier import (
     UNCERTAIN_PREDICTION,
 )
 from classification.constants import Classes, FileTypes
+from classification import utils
 
 logger = logging.getLogger(__name__)
 
 
 class FaceRecognitionClassifier(IndividualClassifier):
-    def predict_file(self, file) -> MulticlassPrediction:
+    def predict_file(self, file_path) -> MulticlassPrediction:
+        if not utils.assess_file_compatability(file_path, self.filetype_compatibility):
+            return UNCERTAIN_PREDICTION
+
         try:
-            image = face_recognition.load_image_file(file)
+            image = face_recognition.load_image_file(file_path)
         except Exception as e:
             # Use a broad except to ensure stability
-            logger.error("Error reading file: %s.\nError: %s", file, e)
+            logger.error("Error reading file: %s.\nError: %s", file_path, e)
             # TODO: log these errors in somewhere for further inspection
             return UNCERTAIN_PREDICTION
 
@@ -89,5 +93,5 @@ class FaceRecognitionClassifier(IndividualClassifier):
         return
 
     @property
-    def filetype_compatibility() -> list:
+    def filetype_compatibility(self) -> list:
         return [FileTypes.jpg, FileTypes.png, FileTypes.webp]

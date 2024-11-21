@@ -6,6 +6,7 @@ from typing import List
 import numpy as np
 
 
+from classification import constants
 from classification.constants import Classes
 
 
@@ -19,8 +20,8 @@ class Prediction:
     confidence: float = field()
 
     @property
-    def positive_prediction_strength(self):
-        # Return the 'positive prediction strength', the idea is that a very confident positive
+    def positive_prediction_strength(self) -> float:
+        """Return the 'positive prediction strength', the idea is that a very confident positive."""
         return self.probability * self.confidence
 
     def __dict__(self):
@@ -46,7 +47,7 @@ class MulticlassPrediction:
 
     @property
     def class_predictions(self):
-        # Store the preds as a list
+        """Return the predictions as a list."""
         return [
             self.prediction_bank_statement,
             self.prediction_drivers_licence,
@@ -87,7 +88,7 @@ UNCERTAIN_PREDICTION = MulticlassPrediction(
     ),
 )
 
-# TODO Upgrade filename classification to Levenstein distance
+# TODO Upgrade filename classification to use Levenstein distance vs. keywords, hence addressing spelling mistakes
 # def classify_file(file: FileStorage):
 #     filename = file.filename.lower()
 #     # file_bytes = file.read()
@@ -113,7 +114,7 @@ class IndividualClassifier(ABC):
     def predict_file() -> MulticlassPrediction:
         pass
 
-    # TODO extend to URL reading/classification
+    # TODO extend to URL reading/classification, download the file to local and proceed with existing file processing
     # @abstractmethod
     # def predict_url():
     #     pass
@@ -125,7 +126,8 @@ class EnsembleClassifier:
     def __init__(self, classifiers):
         self.classifiers = classifiers
 
-    def _get_strongest_positive_pred(self, all_predictions):
+    def _get_strongest_positive_pred(self, all_predictions) -> constants.Classes:
+        """Across all predictions for all classifiers, return the strongest positive prediction."""
         preds_with_strength = [
             (pred.class_ref, pred.positive_prediction_strength)
             for pred in all_predictions
@@ -140,7 +142,8 @@ class EnsembleClassifier:
         )
         return pred_class
 
-    def predict_file(self, file):
+    def predict_file(self, file: str) -> constants.Classes:
+        """For a single file, generate a class prediction"""
         # Have each classifier create a prediction
         classifier_predictions = [
             classifier.predict_file(file) for classifier in self.classifiers
