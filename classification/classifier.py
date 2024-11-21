@@ -174,3 +174,4 @@ class EnsembleClassifier():
         strongest_pred = self._get_strongest_positive_pred(all_predictions)
 
         return strongest_pred
+
