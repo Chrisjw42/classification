@@ -19,6 +19,11 @@ RUN echo 'exec "$@"' >> /app/entrypoint.sh
 # Initiate second stage build to minimise container size
 FROM ubuntu:24.04 AS production
 
+# TODO figure out how to copy ony the useful binaries to reduce the image size further
+RUN apt-get update \
+  && apt-get -y install tesseract-ocr \
+  && apt-get -y install libtesseract-dev
+
 COPY --from=build /app /app
 COPY --from=build --chmod=0755 /app/entrypoint.sh /app/entrypoint.sh
 COPY ./classification /app/classification
@@ -31,7 +36,7 @@ RUN chmod +x /app/entrypoint.sh
 
 ENTRYPOINT [ "/app/entrypoint.sh" ]
 
-CMD ["gunicorn", "-b" ,":8080" ,"--workers", "3", "--timeout", "0", "classification.app:app"]
+CMD ["gunicorn", "-b" ,":8080", "classification.app:app"]
 
 # NOTE tesseract: # If you don't have tesseract executable in your PATH, include the following:
 # pytesseract.pytesseract.tesseract_cmd = r'<full_path_to_your_tesseract_executable>'

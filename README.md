@@ -2,17 +2,8 @@
 In the spirit of the challenge, I hereby swear that I will not use ChatGPT, Claude, or any other LLM to write any code in this fork.
 (Although of course, I am no stranger to them)
 
-# Approach - Classifier
-
-I have taken an ensemble approach, rather than placing all the eggs in a single basket, I let a few different targeted approaches 'vote' on the result. As long is the math is right, this can allows targeted algorithms (that are strong on a certain doc type) have higher influence when they are very confident.
-- The EnsembleClassifier can be instantiated with any number of IndividualClassifiers
-- Each IndividualClassifier adheres to the interface, and provides predictions with it's own methodology, e.g. face recognition.
-- The probability is supplemented with a confidence in some cases
-- The individual votes are collated by the EnsembleClassifier to find the strongest positive class score. TODO: implement negative class scoring
-
-### Insights
-- Don't put overdue emphasis on the filename, since it highly unreliabile in general. We can use it, but we should limit the confidence of results derived from it.
-
+# Reader's note
+- I have marked with TODOs many of the 'next steps' that I did not have time to implement.
 
 # Marking Criteria Comments
 - **Functionality**: Does the classifier work as expected?
@@ -35,6 +26,16 @@ I have taken an ensemble approach, rather than placing all the eggs in a single 
     - Containerised
     - prod pixi environment
 
+# Approach - Classifier
+I have taken an ensemble approach, rather than placing all the eggs in a single basket, I let a few different targeted approaches 'vote' on the result. As long is the math is right, this can allows targeted algorithms (that are strong on a certain doc type) have higher influence when they are very confident.
+- The EnsembleClassifier can be instantiated with any number of IndividualClassifiers
+- Each IndividualClassifier adheres to the interface, and provides predictions with it's own methodology, e.g. face recognition.
+- The probability is supplemented with a confidence in some cases
+- The individual votes are collated by the EnsembleClassifier to find the strongest positive class score. TODO: implement negative class scoring
+- An idea I would love to try (but ran out of time) would be to use Word2Vec embedding to assess the similarity of scraped words to the keywords
+
+### Insights
+- Don't put overdue emphasis on the filename, since it highly unreliabile in general. We can use it, but we should limit the confidence of results derived from it.
 
 # Local development
 ### Non-pixi deps

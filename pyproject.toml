@@ -26,16 +26,15 @@ prod = { features = ["prod"], solve-group = "default" }
 python = ">=3.11"
 flask = ">=3.0.3,<4"
 face_recognition = ">=1.3.0,<2"
-gunicorn = ">=23.0.0,<24"
 pytesseract = ">=0.3.13,<0.4"
 pypdf = ">=5.1.0,<6"
-ruff = ">=0.7.4,<0.8"
-pre-commit = ">=4.0.1,<5"
 
 [tool.pixi.feature.dev.dependencies]
 ipykernel = ">=6.29.5,<7"
 pytest = ">=8.3.3,<9"
 pytest-mock = ">=3.14.0,<4"
+ruff = ">=0.7.4,<0.8"
+pre-commit = ">=4.0.1,<5"
 
 [tool.pixi.feature.prod.dependencies]
 gunicorn = ">=23.0.0,<24"
