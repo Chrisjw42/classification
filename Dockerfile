@@ -32,3 +32,6 @@ RUN chmod +x /app/entrypoint.sh
 ENTRYPOINT [ "/app/entrypoint.sh" ]
 
 CMD ["gunicorn", "-b" ,":8080" ,"--workers", "3", "--timeout", "0", "classification.app:app"]
+
+# NOTE tesseract: # If you don't have tesseract executable in your PATH, include the following:
+# pytesseract.pytesseract.tesseract_cmd = r'<full_path_to_your_tesseract_executable>'
