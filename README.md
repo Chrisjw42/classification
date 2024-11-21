@@ -81,7 +81,7 @@ This means that, when running the container locally on Apple Silicon, you will s
 
 And, unfortunately, I am out of time. I expect this issue will not be present when running in a remote linux environment.
 
-This were the working build/run commands until the addition of facial_recognition caused the above issue.
+These were the working build/run commands until the addition of facial_recognition caused the above issue.
 ```
 docker build . -t classifier --platform linux/amd64
 docker run --rm -it --platform linux/amd64 classifier:latest
