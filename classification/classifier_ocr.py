@@ -12,7 +12,7 @@ from classification.classifier import (
     IndividualClassifier,
     MulticlassPrediction,
     Prediction,
-    DUMMY_PREDICITON,
+    UNCERTAIN_PREDICTION,
 )
 from classification.constants import Classes, FileTypes
 
@@ -67,7 +67,10 @@ class OCRClassifier(IndividualClassifier):
             # TODO: specific exception handling
             logger.error("Error reading file: %s.\nError: %s", file_path, e)
             # TODO: log these errors in somewhere for further inspection
-            return DUMMY_PREDICITON
+            return UNCERTAIN_PREDICTION
+
+        if len(text) == 0:
+            return UNCERTAIN_PREDICTION
 
         words = clean_string(text)
 
